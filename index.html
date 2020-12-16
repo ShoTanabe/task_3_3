@@ -31,6 +31,84 @@
 
     <script type="text/javascript">
 
+      const toDoListArea = document.getElementById('todolistarea');
+      const task = document.getElementById('task');
+      const taskList = [];
+
+        document.getElementById('btn').addEventListener('click', () => {
+
+          //タスクをオブジェクトとして指定、クリックごとに配列に追加
+          const newTask = {taskName:task.value,taskStatus:'作業中'};
+          taskList.push(newTask);
+
+          const makeTbodyArea = () => {
+
+          //1度tbodyを空にする
+          toDoListArea.textContent = '';
+
+            //配列taskList内の要素数だけtr作成
+            taskList.forEach((objects,idNumber) => {
+
+              //テーブルに新しい行を作成
+              const makeTr = document.createElement('tr');
+              toDoListArea.appendChild(makeTr);
+
+              //新しいID、タスク、状態、削除ボタンを格納するtdをそれぞれ作成
+              const makeTdNumber = document.createElement('td');
+              const makeTdTaskName = document.createElement('td');
+              const makeTdStatusBtnArea = document.createElement('td');
+              const makeTdRemoveBtnArea = document.createElement('td');
+
+              //ID、タスクを設定
+              makeTdNumber.textContent = idNumber;
+              makeTdTaskName.textContent = taskList[idNumber].taskName;
+
+              //状態ボタン、削除ボタンを作成
+              const makeStatusBtn = document.createElement('button');
+              const makeRemoveBtn = document.createElement('button');
+
+              //状態ボタンを設定
+              makeStatusBtn.textContent = taskList[idNumber].taskStatus;
+              makeStatusBtn.setAttribute('type','button');
+              makeStatusBtn.addEventListener('click', () => {
+                //オブジェクト内のtaskStatusの値で条件分岐
+                if(taskList[idNumber].taskStatus === '作業中'){
+                taskList[idNumber].taskStatus = '完了';
+                }
+                else if(taskList[idNumber].taskStatus === '完了'){
+                taskList[idNumber].taskStatus = '作業中';
+                }
+                makeStatusBtn.textContent = taskList[idNumber].taskStatus;
+              });
+
+              //削除ボタンを設定
+              makeRemoveBtn.textContent = '削除';
+              makeRemoveBtn.addEventListener('click', () => {
+                //配列taskListから自身を削除して
+                taskList.splice(idNumber,1);
+                //再度trを書き出し
+                makeTbodyArea();
+              });
+
+              //状態ボタン、削除ボタンをtdに追加
+              makeTdStatusBtnArea.appendChild(makeStatusBtn);
+              makeTdRemoveBtnArea.appendChild(makeRemoveBtn);
+
+              //各tdを指定した行に追加
+              makeTr.appendChild(makeTdNumber);
+              makeTr.appendChild(makeTdTaskName);
+              makeTr.appendChild(makeTdStatusBtnArea);
+              makeTr.appendChild(makeTdRemoveBtnArea);
+
+            })
+          }
+
+          makeTbodyArea();
+
+          //テキストボックスをクリア
+          task.value = '';
+
+        });
 
     </script>
 
