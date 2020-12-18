@@ -20,95 +20,92 @@
             <th>状態</th>
           </tr>
         </thead>
-        <tbody id="todolistarea"></tbody>
+        <tbody id="todolist_area"></tbody>
       </table>
-      <div id="textboxarea">
+      <div id="textbox_area">
         <p style="font-weight:bold;">新規タスクの追加</p>
-        <input id="task" type="text" name="task">
-        <input type="button" value="追加" id="btn">
+        <input id="newtask" type="text" name="task">
+        <input type="button" value="追加" id="newtask_btn">
       </div>
     </form>
 
     <script type="text/javascript">
 
-      const toDoListArea = document.getElementById('todolistarea');
-      const task = document.getElementById('task');
+      const toDoListArea = document.getElementById('todolist_area');
+      const newTask = document.getElementById('newtask');
+      const newTaskBtn = document.getElementById('newtask_btn');
       const taskList = [];
 
-        document.getElementById('btn').addEventListener('click', () => {
+      //todoを追加
+      newTaskBtn.addEventListener('click', () => {
+        const task = { taskName:newTask.value, taskStatus:'作業中' };
+        taskList.push(task);
+        showToDoList();
+        newTask.value = '';
+      });
 
-          //タスクをオブジェクトとして指定、クリックごとに配列に追加
-          const newTask = {taskName:task.value,taskStatus:'作業中'};
-          taskList.push(newTask);
+      //todoを表示
+      const showToDoList = () => {
+        toDoListArea.textContent = '';
+        taskList.forEach((taskObject, idNumber) => {
+          const trToDo = document.createElement('tr');
+          toDoListArea.appendChild(trToDo);
 
-          const makeTbodyArea = () => {
+          const tdIdNumber = document.createElement('td');
+          const tdTaskName = document.createElement('td');
+          const tdStatusBtn = document.createElement('td');
+          const tdDeleteBtn = document.createElement('td');
 
-          //1度tbodyを空にする
-          toDoListArea.textContent = '';
+          tdIdNumber.textContent = idNumber;
+          tdTaskName.textContent = taskList[idNumber].taskName;
 
-            //配列taskList内の要素数だけtr作成
-            taskList.forEach((objects,idNumber) => {
+          tdStatusBtn.appendChild(createStatusBtn(idNumber));
+          tdDeleteBtn.appendChild(createDeleteBtn(idNumber));
 
-              //テーブルに新しい行を作成
-              const makeTr = document.createElement('tr');
-              toDoListArea.appendChild(makeTr);
+          trToDo.appendChild(tdIdNumber);
+          trToDo.appendChild(tdTaskName);
+          trToDo.appendChild(tdStatusBtn);
+          trToDo.appendChild(tdDeleteBtn);
+        })
+      }
 
-              //新しいID、タスク、状態、削除ボタンを格納するtdをそれぞれ作成
-              const makeTdNumber = document.createElement('td');
-              const makeTdTaskName = document.createElement('td');
-              const makeTdStatusBtnArea = document.createElement('td');
-              const makeTdRemoveBtnArea = document.createElement('td');
+      //状態ボタンを作成
+      const createStatusBtn = (idNumber) => {
+        const statusBtn = document.createElement('button');
+        statusBtn.setAttribute('type', 'button');
+        statusBtn.textContent = taskList[idNumber].taskStatus;
+        changeStatus(statusBtn, idNumber);
+        return statusBtn;
+      }
 
-              //ID、タスクを設定
-              makeTdNumber.textContent = idNumber;
-              makeTdTaskName.textContent = taskList[idNumber].taskName;
-
-              //状態ボタン、削除ボタンを作成
-              const makeStatusBtn = document.createElement('button');
-              const makeRemoveBtn = document.createElement('button');
-
-              //状態ボタンを設定
-              makeStatusBtn.textContent = taskList[idNumber].taskStatus;
-              makeStatusBtn.setAttribute('type','button');
-              makeStatusBtn.addEventListener('click', () => {
-                //オブジェクト内のtaskStatusの値で条件分岐
-                if(taskList[idNumber].taskStatus === '作業中'){
-                taskList[idNumber].taskStatus = '完了';
-                }
-                else if(taskList[idNumber].taskStatus === '完了'){
-                taskList[idNumber].taskStatus = '作業中';
-                }
-                makeStatusBtn.textContent = taskList[idNumber].taskStatus;
-              });
-
-              //削除ボタンを設定
-              makeRemoveBtn.textContent = '削除';
-              makeRemoveBtn.addEventListener('click', () => {
-                //配列taskListから自身を削除して
-                taskList.splice(idNumber,1);
-                //再度trを書き出し
-                makeTbodyArea();
-              });
-
-              //状態ボタン、削除ボタンをtdに追加
-              makeTdStatusBtnArea.appendChild(makeStatusBtn);
-              makeTdRemoveBtnArea.appendChild(makeRemoveBtn);
-
-              //各tdを指定した行に追加
-              makeTr.appendChild(makeTdNumber);
-              makeTr.appendChild(makeTdTaskName);
-              makeTr.appendChild(makeTdStatusBtnArea);
-              makeTr.appendChild(makeTdRemoveBtnArea);
-
-            })
+      //「作業中」⇔「完了」の切り替えを設定
+      const changeStatus = (statusBtn, idNumber) => {
+        statusBtn.addEventListener('click', () => {
+          if(taskList[idNumber].taskStatus === '作業中'){
+          taskList[idNumber].taskStatus = '完了';
           }
-
-          makeTbodyArea();
-
-          //テキストボックスをクリア
-          task.value = '';
-
+          else if(taskList[idNumber].taskStatus === '完了'){
+          taskList[idNumber].taskStatus = '作業中';
+          }
+          statusBtn.textContent = taskList[idNumber].taskStatus;
         });
+      }
+
+      //削除ボタンを作成
+      const createDeleteBtn = (idNumber) => {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '削除';
+        deleteToDo(deleteBtn, idNumber);
+        return deleteBtn;
+      }
+
+      //todoを削除
+      const deleteToDo = (deleteBtn, idNumber) => {
+        deleteBtn.addEventListener('click', () => {
+          taskList.splice(idNumber, 1);
+          showToDoList();
+        });
+      }
 
     </script>
 
