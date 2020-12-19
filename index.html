@@ -38,7 +38,7 @@
 
       //todoを追加
       newTaskBtn.addEventListener('click', () => {
-        const task = { taskName:newTask.value, taskStatus:'作業中' };
+        const task = { taskName: newTask.value, taskStatus: '作業中' };
         taskList.push(task);
         showToDoList();
         newTask.value = '';
