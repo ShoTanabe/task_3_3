@@ -8,9 +8,9 @@
     <h1>ToDoリスト</h1>
     <form caction="index.html" method="post">
       <div id="radioarea">
-        <input type="radio" name="status" value="すべて" checked>すべて
-        <input type="radio" name="status" value="作業中">作業中
-        <input type="radio" name="status" value="完了">完了
+        <label><input type="radio" name="radio_status" value="すべて" id="radio_all" checked>すべて</label>
+        <label><input type="radio" name="radio_status" value="作業中" id="radio_working">作業中</label>
+        <label><input type="radio" name="radio_status" value="完了" id="radio_finish">完了</label>
       </div>
       <table>
         <thead>
@@ -35,19 +35,23 @@
       const newTask = document.getElementById('newtask');
       const newTaskBtn = document.getElementById('newtask_btn');
       const taskList = [];
+      const radioBtnAll = document.getElementById('radio_all');
+      const radioBtnWorking = document.getElementById('radio_working');
+      const radioBtnFinish = document.getElementById('radio_finish');
 
       //todoを追加
       newTaskBtn.addEventListener('click', () => {
-        const task = { taskName: newTask.value, taskStatus: '作業中' };
+        const task = { taskIdNumber: taskList.length, taskName: newTask.value, taskStatus: '作業中' };
         taskList.push(task);
-        showToDoList();
+        showCheckedToDoList();
         newTask.value = '';
       });
 
       //todoを表示
-      const showToDoList = () => {
+      const showToDoList = (listName) => {
         toDoListArea.textContent = '';
-        taskList.forEach((taskObject, idNumber) => {
+        listName.forEach((taskObject, idNumber) => {
+
           const trToDo = document.createElement('tr');
           toDoListArea.appendChild(trToDo);
 
@@ -56,56 +60,106 @@
           const tdStatusBtn = document.createElement('td');
           const tdDeleteBtn = document.createElement('td');
 
-          tdIdNumber.textContent = idNumber;
-          tdTaskName.textContent = taskList[idNumber].taskName;
+          tdIdNumber.textContent = listName[idNumber].taskIdNumber;
+          tdTaskName.textContent = listName[idNumber].taskName;
 
-          tdStatusBtn.appendChild(createStatusBtn(idNumber));
-          tdDeleteBtn.appendChild(createDeleteBtn(idNumber));
+          tdStatusBtn.appendChild(createStatusBtn(idNumber, listName  ));
+          tdDeleteBtn.appendChild(createDeleteBtn(idNumber, listName));
 
           trToDo.appendChild(tdIdNumber);
           trToDo.appendChild(tdTaskName);
           trToDo.appendChild(tdStatusBtn);
           trToDo.appendChild(tdDeleteBtn);
+
         })
-      }
+      };
 
       //状態ボタンを作成
-      const createStatusBtn = (idNumber) => {
+      const createStatusBtn = (idNumber, listName) => {
         const statusBtn = document.createElement('button');
         statusBtn.setAttribute('type', 'button');
-        statusBtn.textContent = taskList[idNumber].taskStatus;
-        changeStatus(statusBtn, idNumber);
+        statusBtn.textContent = listName[idNumber].taskStatus;
+        changeStatus(statusBtn, idNumber, listName);
         return statusBtn;
-      }
+      };
 
       //「作業中」⇔「完了」の切り替えを設定
-      const changeStatus = (statusBtn, idNumber) => {
+      const changeStatus = (statusBtn, idNumber, listName) => {
         statusBtn.addEventListener('click', () => {
-          if(taskList[idNumber].taskStatus === '作業中'){
-          taskList[idNumber].taskStatus = '完了';
+          if(listName[idNumber].taskStatus === '作業中'){
+            listName[idNumber].taskStatus = '完了';
           }
-          else if(taskList[idNumber].taskStatus === '完了'){
-          taskList[idNumber].taskStatus = '作業中';
+          else if(listName[idNumber].taskStatus === '完了'){
+          listName[idNumber].taskStatus = '作業中';
           }
-          statusBtn.textContent = taskList[idNumber].taskStatus;
+          statusBtn.textContent = listName[idNumber].taskStatus;
+          showCheckedToDoList();
         });
-      }
+      };
 
       //削除ボタンを作成
-      const createDeleteBtn = (idNumber) => {
+      const createDeleteBtn = (idNumber, listName) => {
         const deleteBtn = document.createElement('button');
+        deleteBtn.setAttribute('type', 'button');
         deleteBtn.textContent = '削除';
-        deleteToDo(deleteBtn, idNumber);
+        deleteToDo(deleteBtn, idNumber, listName);
         return deleteBtn;
-      }
+      };
 
       //todoを削除
-      const deleteToDo = (deleteBtn, idNumber) => {
+      const deleteToDo = (deleteBtn, idNumber, listName) => {
+
+        //フィルタ使用時の配列と同じ値を元の配列から取得
+        const getIdNumber = listName[idNumber].taskIdNumber;
         deleteBtn.addEventListener('click', () => {
-          taskList.splice(idNumber, 1);
-          showToDoList();
+          const getTaskListId = () => {
+            for(let i = 0; i < taskList.length; i++){
+              if(taskList[i].taskIdNumber === getIdNumber){
+                return i;
+                break;
+              }
+              else{
+                continue;
+              }
+            }
+          };
+
+          taskList.splice(getTaskListId(), 1);
+
+          //IDを再設定
+          taskList.forEach((taskObject, idNumber2) => {
+            taskList[idNumber2].taskIdNumber = idNumber2;
+          });
+          showCheckedToDoList();
         });
-      }
+      };
+
+      //ラジオボタンの切り替えを設定
+      const radioBtns = document.getElementsByName('radio_status');
+      radioBtns.forEach((status,btnNumber) => {
+        radioBtns[btnNumber].addEventListener('click', () => {
+          showCheckedToDoList();
+        });
+      });
+
+      //選択されたラジオボタンに応じて表示するリストを設定
+      const showCheckedToDoList = (task) => {
+        if(radioBtnAll.checked){
+          return showToDoList(taskList);
+        }
+        else if(radioBtnWorking.checked){
+          const workingList = taskList.filter((task) => {
+            return task.taskStatus === '作業中';
+          })
+          return showToDoList(workingList);
+        }
+        else if(radioBtnFinish.checked){
+          const finishList = taskList.filter((task) => {
+            return task.taskStatus === '完了';
+          })
+          return showToDoList(finishList);
+        }
+      };
 
     </script>
 
