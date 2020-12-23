@@ -35,7 +35,6 @@
       const newTask = document.getElementById('newtask');
       const newTaskBtn = document.getElementById('newtask_btn');
       const taskList = [];
-      const statusRadioBtn = document.getElementsByName('radio_status');
       const radioBtnAll = document.getElementById('radio_all');
       const radioBtnWorking = document.getElementById('radio_working');
       const radioBtnFinish = document.getElementById('radio_finish');
@@ -47,8 +46,6 @@
         showCheckedToDoList();
         newTask.value = '';
       });
-
-
 
       //todoを表示
       const showToDoList = (listName) => {
